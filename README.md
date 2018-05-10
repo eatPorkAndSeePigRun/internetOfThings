@@ -5,11 +5,12 @@
 
 # 项目结构
 
+- config            一些配置
 - controller        控制层
 - dao               数据库层
+- doc               存放其他.md文件
 - model             实体类层
 - service           逻辑层
-- doc               存放其他.md文件
     - main.go           主入口
     - .gitignore        忽略git不必要提交的文件
     - LICENSE           开源许可为Apache License
@@ -18,7 +19,7 @@
 总体形式为
 ```
 {
-    code: 1     // 只有1为请求成功 其他值需要额外处理
+    code: 0     // 只有0为请求成功 其他值需要额外处理
     msg:  'ok'  // 描述信息
     data: {} // 具体data
 }
