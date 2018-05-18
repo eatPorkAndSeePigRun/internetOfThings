@@ -25,8 +25,9 @@ func (um UserMapper) SelectAll() []model.User {
 }
 
 func (um UserMapper) CheckUsername(id string) int64 {
+	sql :="select count(1) from user where id = ?"
 	var count int64
-	err := config.Db.QueryRow("select count(1) from user where id = ?",id).Scan(&count)
+	err := config.Db.QueryRow(sql,id).Scan(&count)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -36,8 +37,9 @@ func (um UserMapper) CheckUsername(id string) int64 {
 // TODO 如果查询不成功则返回为赋值的model.User类
 func (um UserMapper) SelectLogin(id string, password string) model.User {
 	var user model.User
-	sql := "select id, true_name, password, power from user where id = ? and password = ?"
-	err := config.Db.QueryRow(sql,id,password).Scan(&user.Id, &user.TrueName, &user.Password, &user.Power)
+	sql := "select id, true_name, password, power, create_time, update_time from user where id = ? and password = ?"
+	err := config.Db.QueryRow(sql,id,password).
+		Scan(&user.Id, &user.TrueName, &user.Password, &user.Power, &user.CreateTime, &user.UpdateTime)
 	if err != nil {
 		fmt.Println(err)
 	}
