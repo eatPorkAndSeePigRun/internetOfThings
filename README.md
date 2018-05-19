@@ -47,3 +47,6 @@
 2. 新建 dev_xxx 分支
 3. 提交代码
 4. 新建 Pull Request
+
+数据库1.0版，其中monit数据表需要修改
+![数据库模型图](https://eatporkandseepigrun.github.io/model.png)
