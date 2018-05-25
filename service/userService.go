@@ -8,10 +8,6 @@ import (
 type UserService struct {
 }
 
-func (us UserService) SelectAll()  {
-	
-}
-
 func (us UserService) Login(id string,password string) config.ServerResponse{
 	var um dao.UserMapper
 	resultCount := um.CheckUsername(id);
@@ -24,5 +20,21 @@ func (us UserService) Login(id string,password string) config.ServerResponse{
 	}else{
 		return config.CreateBySuccessMessage1("登录成功")
 	}
+}
+
+func (us UserService) UserInformation(id string) config.ServerResponse {
+	var um dao.UserMapper
+	user:=um.SelectById(id)
+	if user.Id == "" {
+		return config.CreateByErrorMessage("找不到当前用户")
+	}else {
+		return config.CreateBySuccessMessage2(user)
+	}
+}
+
+func (us UserService) UsersInformation() config.ServerResponse {
+	var um dao.UserMapper
+	user:=um.SelectAll()
+	return config.CreateBySuccessMessage2(user)
 }
 
