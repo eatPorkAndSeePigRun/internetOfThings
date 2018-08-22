@@ -6,9 +6,17 @@ import (
 	_ "github.com/Go-SQL-Driver/MySQL"
 	"net/http"
 	"internetOfThings/controller"
+	"time"
 )
 
 func main() {
+	go handleFront()
+	for true  {
+		time.Sleep(1)
+	}
+}
+
+func handleFront()  {
 	config.SqlOpen()
 	fmt.Println("hello world!")
 	http.HandleFunc("/login", controller.HandleLogin)
