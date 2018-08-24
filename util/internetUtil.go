@@ -92,6 +92,7 @@ func decodeCommandIdentifier(commandIdentifier byte) (error) {
 
 func decodeSensorName(sensorName []byte) (error) {
 	//TODO
+	fmt.Println(sensorName)
 	return nil
 }
 
