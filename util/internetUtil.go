@@ -3,6 +3,7 @@ package util
 import (
 	"net"
 	"bytes"
+	"fmt"
 )
 
 type InternetUtil struct {
@@ -46,20 +47,29 @@ func readData(conn net.Conn) ([]byte, error) {
 			}
 		}
 	}
-
+	return nil,nil
 }
 
 func decode(data []byte) (string) {
-	err := decodeDataLength(data[0], len(data))
+	err := decodeCheckCode(data)
+	checkError(err)
+	length := len(data)
+	err = decodeDataLength(data[0], length)
 	checkError(err)
 	err = decodeCommandIdentifier(data[1])
 	checkError(err)
+	err = decodeSensorName(data[1:4])
+	checkError(err)
+	sensorModuleAddress := decodeSensorModuleAddress(data[5])
+	fmt.Println("sensorModuleAddress:",sensorModuleAddress)
+	sensorData := decodeSensorData(data[6:length-2])
+	fmt.Println("sensorData:",sensorData)
 	return ""
 }
 
 func decodeDataLength(dataLength byte, dataRealLength int) (error) {
 	if int(dataLength) != (dataRealLength - 2) {
-		return &decodeError{"数据长度不对"}
+		return &decodeError{"数据长度错误"}
 	}
 	return nil
 }
@@ -74,6 +84,8 @@ func decodeCommandIdentifier(commandIdentifier byte) (error) {
 		//基板：Test测试确认命令		传感器模块：发送一次数据命令
 	} else if commandIdentifier == 0xF4 {
 		//基板：查询传感器模块地址	传感器模块：发送传感器地址
+	} else {
+		return &decodeError{"未能识别命令标识符！"}
 	}
 	return nil
 }
@@ -83,16 +95,30 @@ func decodeSensorName(sensorName []byte) (error) {
 	return nil
 }
 
-func decodeSensorModuleAddress() {
-
+func decodeSensorModuleAddress(sensorModuleAddress byte) (int) {
+	return int(sensorModuleAddress)
 }
 
-func decodeSensorData() {
-
+func decodeSensorData(sensorData []byte) ([]int) {
+	sensorDataLength := int(sensorData[0])
+	sensorDataValue := make([]int, sensorDataLength/2)
+	for i := 1; i < sensorDataLength; i = i + 2 {
+		sensorDataValue[(i-1)/2] = int(sensorData[i])*4096 + int(sensorData[i+1])
+	}
+	return sensorDataValue
 }
 
-func decodeCheckCode() {
-
+func decodeCheckCode(data []byte) (error) {
+	checkLength := 0
+	length := len(data)
+	checkCode := int(data[length-1])
+	for i := 0; i < length-2; i++ {
+		checkLength = checkLength + int(data[i])
+	}
+	if checkLength != checkCode {
+		return &decodeError{"校验错误"}
+	}
+	return nil
 }
 
 func checkError(err error) {
