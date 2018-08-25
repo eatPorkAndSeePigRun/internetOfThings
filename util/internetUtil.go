@@ -4,6 +4,7 @@ import (
 	"net"
 	"bytes"
 	"fmt"
+	"strconv"
 )
 
 type InternetUtil struct {
@@ -47,24 +48,28 @@ func readData(conn net.Conn) ([]byte, error) {
 			}
 		}
 	}
-	return nil,nil
+	return nil, nil
 }
 
 func decode(data []byte) (string) {
+	//进行校验码校对，若异常则抛出
 	err := decodeCheckCode(data)
 	checkError(err)
+	//进行数据长度校对，若异常则抛出
 	length := len(data)
 	err = decodeDataLength(data[0], length)
 	checkError(err)
+	//TODO: 添加命令标识符逻辑
 	err = decodeCommandIdentifier(data[1])
 	checkError(err)
-	err = decodeSensorName(data[1:4])
-	checkError(err)
+	//进行传感器名称、传感器模块地址、传感器数据
+	sensorNameCode := decodeSensorName(data[1:4])
 	sensorModuleAddress := decodeSensorModuleAddress(data[5])
-	fmt.Println("sensorModuleAddress:",sensorModuleAddress)
 	sensorData := decodeSensorData(data[6:length-2])
-	fmt.Println("sensorData:",sensorData)
-	return ""
+	fmt.Println("sensorNameCode:", sensorNameCode)
+	fmt.Println("sensorModuleAddress:", sensorModuleAddress)
+	fmt.Println("sensorData:", sensorData)
+	return "decode success"
 }
 
 func decodeDataLength(dataLength byte, dataRealLength int) (error) {
@@ -90,10 +95,9 @@ func decodeCommandIdentifier(commandIdentifier byte) (error) {
 	return nil
 }
 
-func decodeSensorName(sensorName []byte) (error) {
-	//TODO
-	fmt.Println(sensorName)
-	return nil
+func decodeSensorName(sensorName []byte) (string) {
+	sensorNameCode := strconv.Itoa(int(sensorName[0])) + strconv.Itoa(int(sensorName[1])) + strconv.Itoa(int(sensorName[2]))
+	return sensorNameCode
 }
 
 func decodeSensorModuleAddress(sensorModuleAddress byte) (int) {
