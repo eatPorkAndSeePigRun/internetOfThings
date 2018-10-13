@@ -5,6 +5,6 @@ import "database/sql"
 var Db *sql.DB
 
 const (
-	SUCCESS = 0
+	SUCCESS = 2000
 	ERROR   = 1
 )
